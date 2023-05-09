@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Number Line</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: black;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .arrow-segment {
+            height: 3px;
+            width: 10px;
+            background-color: black;
+            position: absolute;
+        }
+        .left-arrow-top {
+            margin-left: 383px;
+            margin-top: 47px;
+            transform: rotate(135deg);
+            -webkit-transform: rotate(135deg);
+        }
+        .right-arrow-top {
+            margin-left: 1144px;
+            margin-top: 47px;
+            transform: rotate(45deg);
+            -webkit-transform: rotate(45deg);
+        }
+        .left-arrow-bottom {
+            margin-left: 383px;
+            margin-top: 53px;
+            transform: rotate(45deg);
+            -webkit-transform: rotate(45deg);
+        }
+        .right-arrow-bottom {
+            margin-left: 1144px;
+            margin-top: 53px;
+            transform: rotate(135deg);
+            -webkit-transform: rotate(135deg);
+        }
+
+        .tick-mark {
+            height: 12px;
+            width: 3px;
+            margin-top: 46px;
+            background-color: black;
+            position: absolute;
+        }
+
+        .number-incr {
+            width: 3px;
+            margin-top: 63px;
+            position: absolute;
+        }
+
+        .dot {
+            height: 14px;
+            width: 14px;
+            margin-top: 52px;
+            position: absolute;
+            cursor: move;
+            background-color: black;
+            border-radius: 50%;
+            display: inline-block;
+            z-index: 9;
+        }
+
+        #highlighted {
+            height: 7px;
+            z-index: -10;
+            margin-top: 48px;
+            background-color: black;
+            position: absolute;
+        }
+
+        .number-line {
+            height: 3px;
+            width: 768px;
+            margin-left: 384px;
+            margin-top: 50px;
+            background-color: black;
+            position: absolute;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="arrow-segment left-arrow-top"></div>
+    <div class="arrow-segment left-arrow-bottom"></div>
+    <div class="number-line"></div>
+
+    <div class="tick-mark" style="margin-left: 415px"></div>
+    <div class="tick-mark" style="margin-left: 485px"></div>
+    <div class="tick-mark" style="margin-left: 556px"></div>
+    <div class="tick-mark" style="margin-left: 627px"></div>
+    <div class="tick-mark" style="margin-left: 697px"></div>
+    <div class="tick-mark" style="margin-left: 768px"></div>
+    <div class="tick-mark" style="margin-left: 839px"></div>
+    <div class="tick-mark" style="margin-left: 909px"></div>
+    <div class="tick-mark" style="margin-left: 980px"></div>
+    <div class="tick-mark" style="margin-left: 1051px"></div>
+    <div class="tick-mark" style="margin-left: 1121px"></div>
+
+    <p class="number-incr" style="margin-left: 415px">-5</p>
+    <p class="number-incr" style="margin-left: 485px">-4</p>
+    <p class="number-incr" style="margin-left: 556px">-3</p>
+    <p class="number-incr" style="margin-left: 627px">-2</p>
+    <p class="number-incr" style="margin-left: 697px">-1</p>
+    <p class="number-incr" style="margin-left: 768px">0</p>
+    <p class="number-incr" style="margin-left: 839px">1</p>
+    <p class="number-incr" style="margin-left: 909px">2</p>
+    <p class="number-incr" style="margin-left: 980px">3</p>
+    <p class="number-incr" style="margin-left: 1051px">4</p>
+    <p class="number-incr" style="margin-left: 1121px">5</p>
+
+    <span id="dot-1" class="dot"></span>
+    <span id="dot-2" class="dot"></span>
+    <div id="highlighted"></div>
+    <div class="arrow-segment right-arrow-top"></div>
+    <div class="arrow-segment right-arrow-bottom"></div>
+  </body>
+
+  <script type="text/javascript">
+    var dot1 = document.getElementById("dot-1");
+    dragElement(document.getElementById("dot-1"));
+    dot1.style.top = "0px";
+    dot1.style.left = "627px";
+
+    var dot2 = document.getElementById("dot-2");
+    dragElement(document.getElementById("dot-2"));
+    dot2.style.top = "0px";
+    dot2.style.left = "909px";
+
+    var highlighted = document.getElementById("highlighted");
+
+    function dragElement(elmnt) {
+        if (document.getElementById(elmnt.id + "header")) {
+            document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+        } else {
+            elmnt.onmousedown = dragMouseDown;
+        }
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+        }
+
+        function updateHighlight() {
+            // update the coordinates of the highlighted line segment
+            var farther_left = Math.min(parseInt(dot1.style.left), parseInt(dot2.style.left));
+            var farther_right = Math.max(parseInt(dot1.style.left), parseInt(dot2.style.left));
+
+            highlighted.style.left = farther_left + 6 + "px";
+            highlighted.style.width = farther_right - farther_left + "px";
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+            elmnt.style.top = "0px";
+
+            // keep the point from escaping the line segment
+            elmnt.style.left = Math.min(Math.max(418, e.clientX), 1124) + "px";
+
+            updateHighlight();
+        }
+
+        function closeDragElement() {
+            // when the mouse is finished dragging, move the point that's being dragged
+            // to the nearest tick mark
+            var offset = parseInt(elmnt.style.left) - 415;
+            var ticks = Math.floor(offset / 70.6 + 0.5);
+            var xPos = Math.floor(415 + 70.6 * ticks) + 3;
+            elmnt.style.left = xPos + "px";
+
+            // update the highlighted line segment again, to match the points that have
+            // been snapped to the grid
+            updateHighlight();
+
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+    }
+  </script>
+</html>
